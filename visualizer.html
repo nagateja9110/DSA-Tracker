@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DSA Code Visualizer | Step-by-Step Execution</title>
+    <link rel="stylesheet" href="visualizer.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <a href="index.html" class="back-link">← Back to Tracker</a>
+        <h1>🔬 DSA Code Visualizer</h1>
+      </div>
+      <div class="header-right">
+        <select id="exampleSelect" class="example-select">
+          <option value="">Load Example...</option>
+          <optgroup label="Sorting">
+            <option value="bubbleSort">Bubble Sort</option>
+            <option value="quickSort">Quick Sort</option>
+            <option value="mergeSort">Merge Sort</option>
+          </optgroup>
+          <optgroup label="Searching">
+            <option value="binarySearch">Binary Search</option>
+            <option value="linearSearch">Linear Search</option>
+          </optgroup>
+          <optgroup label="Linked List">
+            <option value="linkedListReverse">Reverse Linked List</option>
+            <option value="linkedListCycle">Detect Cycle</option>
+          </optgroup>
+          <optgroup label="Trees">
+            <option value="bstInsert">BST Insert</option>
+            <option value="treeTraversal">Tree Traversals</option>
+          </optgroup>
+          <optgroup label="Stack & Queue">
+            <option value="stackOps">Stack Operations</option>
+            <option value="queueOps">Queue Operations</option>
+          </optgroup>
+          <optgroup label="Graphs">
+            <option value="bfs">BFS Traversal</option>
+            <option value="dfs">DFS Traversal</option>
+          </optgroup>
+        </select>
+        <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+      <!-- Left Panel: Code Editor -->
+      <div class="left-panel">
+        <div class="panel-header">
+          <span class="panel-title">📝 Code Editor</span>
+          <div class="editor-actions">
+            <button id="formatBtn" class="action-btn" title="Format Code">
+              ⚙️ Format
+            </button>
+            <button id="clearBtn" class="action-btn" title="Clear Code">
+              🗑️ Clear
+            </button>
+          </div>
+        </div>
+        <div id="editorContainer" class="editor-container">
+          <div id="monacoEditor"></div>
+        </div>
+
+        <!-- Playback Controls -->
+        <div class="playback-controls">
+          <button
+            id="runBtn"
+            class="control-btn primary"
+            title="Run Visualization"
+          >
+            <span class="btn-icon">▶️</span> Visualize
+          </button>
+          <button
+            id="stepBackBtn"
+            class="control-btn"
+            title="Step Back"
+            disabled
+          >
+            <span class="btn-icon">⏮️</span>
+          </button>
+          <button
+            id="playPauseBtn"
+            class="control-btn"
+            title="Play/Pause"
+            disabled
+          >
+            <span class="btn-icon">⏸️</span>
+          </button>
+          <button
+            id="stepForwardBtn"
+            class="control-btn"
+            title="Step Forward"
+            disabled
+          >
+            <span class="btn-icon">⏭️</span>
+          </button>
+          <button id="resetBtn" class="control-btn" title="Reset" disabled>
+            <span class="btn-icon">🔄</span>
+          </button>
+          <div class="speed-control">
+            <label for="speedSlider">Speed:</label>
+            <input type="range" id="speedSlider" min="1" max="10" value="5" />
+            <span id="speedValue">1x</span>
+          </div>
+        </div>
+
+        <!-- Step Progress -->
+        <div class="step-progress">
+          <span id="stepCounter">Step: 0 / 0</span>
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resizer -->
+      <div class="resizer" id="resizer"></div>
+
+      <!-- Right Panel: Visualization -->
+      <div class="right-panel">
+        <!-- Visualization Canvas -->
+        <div class="visualization-section">
+          <div class="panel-header">
+            <span class="panel-title">🎨 Visualization</span>
+            <div class="viz-tabs">
+              <button class="viz-tab active" data-tab="main">Main</button>
+              <button class="viz-tab" data-tab="callstack">Call Stack</button>
+            </div>
+          </div>
+          <div id="visualizationCanvas" class="visualization-canvas">
+            <div class="viz-placeholder">
+              <span class="placeholder-icon">🚀</span>
+              <p>
+                Paste your code and click <strong>Visualize</strong> to see the
+                magic!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variable Inspector -->
+        <div class="inspector-section">
+          <div class="panel-header">
+            <span class="panel-title">🔍 Variable Inspector</span>
+            <button id="expandInspector" class="expand-btn" title="Expand">
+              ⬆️
+            </button>
+          </div>
+          <div id="variableInspector" class="variable-inspector">
+            <div class="inspector-placeholder">
+              <p>Variables will appear here during execution</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Console Output -->
+        <div class="console-section">
+          <div class="panel-header">
+            <span class="panel-title">💻 Console</span>
+            <button
+              id="clearConsole"
+              class="action-btn small"
+              title="Clear Console"
+            >
+              Clear
+            </button>
+          </div>
+          <div id="consoleOutput" class="console-output">
+            <div class="console-welcome">
+              <span class="console-line"
+                >// Console output will appear here...</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/acorn/8.11.2/acorn.min.js"></script>
+    <script src="interpreter.js"></script>
+    <script src="renderers/array-renderer.js"></script>
+    <script src="renderers/linkedlist-renderer.js"></script>
+    <script src="renderers/tree-renderer.js"></script>
+    <script src="renderers/stack-queue-renderer.js"></script>
+    <script src="renderers/graph-renderer.js"></script>
+    <script src="renderers/heap-renderer.js"></script>
+    <script src="examples.js"></script>
+    <script src="visualizer-app.js"></script>
+  </body>
+</html>
