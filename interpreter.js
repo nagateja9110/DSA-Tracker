@@ -1,37 +1,45 @@
 /**
- * DSA Code Interpreter
- * Step-by-step JavaScript interpreter with state tracking
+ * DSA Code Interpreter v2
+ * Enhanced step-by-step JavaScript interpreter with real execution and state tracking
  */
 
 class DSAInterpreter {
     constructor() {
+        this.reset();
+    }
+
+    reset() {
         this.steps = [];
         this.currentStep = 0;
-        this.variables = new Map();
-        this.callStack = [];
-        this.dataStructures = new Map();
+        this.executionContext = null;
         this.consoleOutput = [];
-        this.isRunning = false;
+        this.dataStructures = {
+            arrays: {},
+            linkedLists: {},
+            trees: {},
+            graphs: {},
+            stacks: {},
+            queues: {},
+            heaps: {}
+        };
     }
 
     /**
      * Parse and prepare code for step-by-step execution
-     * @param {string} code - JavaScript code to interpret
-     * @returns {Array} Array of execution steps
      */
     parse(code) {
         this.reset();
         
         try {
-            // Parse code into AST using Acorn
+            // Parse code into AST
             const ast = acorn.parse(code, {
                 ecmaVersion: 2020,
                 sourceType: 'script',
                 locations: true
             });
 
-            // Generate execution steps from AST
-            this.generateSteps(ast);
+            // Create instrumented execution 
+            this.instrumentCode(ast, code);
             
             return {
                 success: true,
@@ -48,78 +56,94 @@ class DSAInterpreter {
     }
 
     /**
-     * Reset interpreter state
+     * Instrument the AST to create execution steps
      */
-    reset() {
-        this.steps = [];
-        this.currentStep = 0;
-        this.variables = new Map();
-        this.callStack = [];
-        this.dataStructures = new Map();
-        this.consoleOutput = [];
-        this.isRunning = false;
-    }
-
-    /**
-     * Generate execution steps from AST
-     */
-    generateSteps(ast) {
+    instrumentCode(ast, originalCode) {
+        const lines = originalCode.split('\n');
         const self = this;
         
-        // Create execution context
-        const context = {
-            variables: new Map(),
-            functions: new Map(),
-            arrays: new Map(),
-            linkedLists: new Map(),
-            trees: new Map(),
-            stacks: new Map(),
-            queues: new Map(),
-            graphs: new Map(),
-            heaps: new Map()
+        // Create a sandboxed execution environment
+        this.executionContext = {
+            variables: {},
+            functions: {},
+            console: {
+                log: (...args) => {
+                    self.consoleOutput.push({
+                        type: 'log',
+                        message: args.map(a => self.formatValue(a)).join(' ')
+                    });
+                },
+                warn: (...args) => {
+                    self.consoleOutput.push({
+                        type: 'warn',
+                        message: args.map(a => self.formatValue(a)).join(' ')
+                    });
+                },
+                error: (...args) => {
+                    self.consoleOutput.push({
+                        type: 'error',
+                        message: args.map(a => self.formatValue(a)).join(' ')
+                    });
+                }
+            }
         };
 
-        // Walk the AST and generate steps
-        this.walkAST(ast.body, context);
+        // Walk AST and create steps
+        this.walkAST(ast.body, lines);
     }
 
     /**
-     * Walk AST nodes and generate execution steps
+     * Walk AST and generate execution steps
      */
-    walkAST(nodes, context, parentFunction = null) {
+    walkAST(nodes, lines) {
         for (const node of nodes) {
-            this.processNode(node, context, parentFunction);
+            this.processNode(node, lines);
         }
     }
 
     /**
-     * Process individual AST node
+     * Process individual AST node and create execution step
      */
-    processNode(node, context, parentFunction = null) {
+    processNode(node, lines) {
+        const lineNum = node.loc ? node.loc.start.line : 0;
+        const lineCode = lines[lineNum - 1] || '';
+        
+        // Skip empty lines and comments
+        if (!lineCode.trim() || lineCode.trim().startsWith('//')) {
+            return;
+        }
+
         switch (node.type) {
             case 'VariableDeclaration':
-                this.processVariableDeclaration(node, context);
+                this.processVariableDeclaration(node, lineNum, lineCode);
                 break;
-            case 'FunctionDeclaration':
-                this.processFunctionDeclaration(node, context);
-                break;
+                
             case 'ExpressionStatement':
-                this.processExpressionStatement(node, context);
+                this.processExpressionStatement(node, lineNum, lineCode);
                 break;
+                
             case 'ForStatement':
-                this.processForStatement(node, context);
+                this.processForStatement(node, lines);
                 break;
+                
             case 'WhileStatement':
-                this.processWhileStatement(node, context);
+                this.processWhileStatement(node, lines);
                 break;
+                
             case 'IfStatement':
-                this.processIfStatement(node, context);
+                this.processIfStatement(node, lines);
                 break;
-            case 'ReturnStatement':
-                this.processReturnStatement(node, context, parentFunction);
+                
+            case 'FunctionDeclaration':
+                this.processFunctionDeclaration(node, lineNum, lineCode);
                 break;
+                
             case 'BlockStatement':
-                this.walkAST(node.body, context, parentFunction);
+                this.walkAST(node.body, lines);
+                break;
+                
+            case 'ReturnStatement':
+                this.processReturnStatement(node, lineNum, lineCode);
                 break;
         }
     }
@@ -127,145 +151,126 @@ class DSAInterpreter {
     /**
      * Process variable declarations
      */
-    processVariableDeclaration(node, context) {
-        for (const declarator of node.declarations) {
-            const varName = declarator.id.name;
-            const initValue = declarator.init ? this.evaluateExpression(declarator.init, context) : undefined;
+    processVariableDeclaration(node, lineNum, lineCode) {
+        const self = this;
+        
+        for (const decl of node.declarations) {
+            const varName = decl.id.name;
+            const kind = node.kind;
             
-            // Detect data structure type
-            const dsType = this.detectDataStructure(declarator.init, initValue);
-            
-            // Add step
             this.steps.push({
                 type: 'variable-declaration',
-                line: node.loc.start.line,
-                lineEnd: node.loc.end.line,
-                description: `Declare ${node.kind} ${varName}${initValue !== undefined ? ` = ${this.formatValue(initValue)}` : ''}`,
-                action: () => {
-                    context.variables.set(varName, {
-                        value: this.cloneValue(initValue),
-                        type: typeof initValue,
-                        dsType: dsType
-                    });
+                line: lineNum,
+                code: lineCode.trim(),
+                description: `Declare ${kind} ${varName}`,
+                varName: varName,
+                execute: () => {
+                    const value = decl.init ? self.evaluate(decl.init) : undefined;
+                    self.executionContext.variables[varName] = {
+                        value: self.cloneValue(value),
+                        type: self.getType(value),
+                        dsType: self.detectDataStructure(value)
+                    };
                     
                     // Register data structure if detected
-                    if (dsType) {
-                        this.registerDataStructure(varName, dsType, initValue, context);
-                    }
-                },
-                getState: () => this.captureState(context)
+                    self.registerDataStructure(varName, value);
+                    
+                    return self.captureState();
+                }
             });
         }
     }
 
     /**
-     * Process function declarations
-     */
-    processFunctionDeclaration(node, context) {
-        const funcName = node.id.name;
-        const params = node.params.map(p => p.name);
-        
-        // Store function in context
-        context.functions.set(funcName, {
-            params: params,
-            body: node.body,
-            node: node
-        });
-
-        this.steps.push({
-            type: 'function-declaration',
-            line: node.loc.start.line,
-            lineEnd: node.loc.end.line,
-            description: `Define function ${funcName}(${params.join(', ')})`,
-            action: () => {},
-            getState: () => this.captureState(context)
-        });
-    }
-
-    /**
      * Process expression statements
      */
-    processExpressionStatement(node, context) {
+    processExpressionStatement(node, lineNum, lineCode) {
+        const self = this;
         const expr = node.expression;
         
-        switch (expr.type) {
-            case 'AssignmentExpression':
-                this.processAssignment(expr, node, context);
-                break;
-            case 'UpdateExpression':
-                this.processUpdate(expr, node, context);
-                break;
-            case 'CallExpression':
-                this.processCallExpression(expr, node, context);
-                break;
+        let description = 'Execute expression';
+        let highlights = {};
+        
+        // Detect specific operations
+        if (expr.type === 'AssignmentExpression') {
+            description = this.describeAssignment(expr);
+            highlights = this.getAssignmentHighlights(expr);
+        } else if (expr.type === 'UpdateExpression') {
+            description = `Update: ${expr.argument.name}${expr.operator}`;
+        } else if (expr.type === 'CallExpression') {
+            description = this.describeCall(expr);
         }
-    }
-
-    /**
-     * Process assignment expressions
-     */
-    processAssignment(expr, node, context) {
-        const target = this.getAssignmentTarget(expr.left);
-        const description = this.generateAssignmentDescription(expr, context);
         
         this.steps.push({
-            type: 'assignment',
-            line: node.loc.start.line,
-            lineEnd: node.loc.end.line,
+            type: 'expression',
+            line: lineNum,
+            code: lineCode.trim(),
             description: description,
-            action: () => {
-                const value = this.evaluateExpression(expr.right, context);
-                this.performAssignment(expr.left, value, expr.operator, context);
-            },
-            highlight: target,
-            getState: () => this.captureState(context)
+            highlights: highlights,
+            execute: () => {
+                self.evaluate(expr);
+                return self.captureState();
+            }
         });
     }
 
     /**
-     * Process for loops
+     * Process for loops - unroll iterations
      */
-    processForStatement(node, context) {
-        // Init step
+    processForStatement(node, lines) {
+        const self = this;
+        const lineNum = node.loc.start.line;
+        const lineCode = lines[lineNum - 1] || '';
+        
+        // Process init
         if (node.init) {
             if (node.init.type === 'VariableDeclaration') {
-                this.processVariableDeclaration(node.init, context);
+                this.processVariableDeclaration(node.init, lineNum, lineCode);
+            } else {
+                this.steps.push({
+                    type: 'for-init',
+                    line: lineNum,
+                    code: lineCode.trim(),
+                    description: 'Initialize loop',
+                    execute: () => {
+                        self.evaluate(node.init);
+                        return self.captureState();
+                    }
+                });
             }
         }
-
-        // Create loop step structure
-        const loopBodySteps = [];
         
-        // Process body (will be executed multiple times during simulation)
+        // Create loop structure step
         this.steps.push({
-            type: 'for-loop-start',
-            line: node.loc.start.line,
+            type: 'for-loop',
+            line: lineNum,
+            code: lineCode.trim(),
             description: 'Enter for loop',
             isLoop: true,
             testNode: node.test,
             updateNode: node.update,
             bodyNode: node.body,
-            action: () => {},
-            getState: () => this.captureState(context)
+            execute: () => self.captureState()
         });
-
-        // Process the body
+        
+        // Process body (simplified - shows one iteration)
         if (node.body.type === 'BlockStatement') {
-            this.walkAST(node.body.body, context);
+            this.walkAST(node.body.body, lines);
         } else {
-            this.processNode(node.body, context);
+            this.processNode(node.body, lines);
         }
-
-        // Loop update and check
+        
+        // Loop update step
         if (node.update) {
             this.steps.push({
-                type: 'for-loop-update',
-                line: node.loc.start.line,
+                type: 'for-update',
+                line: lineNum,
+                code: `Loop update`,
                 description: 'Loop iteration',
-                action: () => {
-                    this.evaluateExpression(node.update, context);
-                },
-                getState: () => this.captureState(context)
+                execute: () => {
+                    self.evaluate(node.update);
+                    return self.captureState();
+                }
             });
         }
     }
@@ -273,175 +278,167 @@ class DSAInterpreter {
     /**
      * Process while loops
      */
-    processWhileStatement(node, context) {
+    processWhileStatement(node, lines) {
+        const self = this;
+        const lineNum = node.loc.start.line;
+        const lineCode = lines[lineNum - 1] || '';
+        
         this.steps.push({
-            type: 'while-loop-start',
-            line: node.loc.start.line,
+            type: 'while-loop',
+            line: lineNum,
+            code: lineCode.trim(),
             description: 'Check while condition',
             isLoop: true,
             testNode: node.test,
-            action: () => {},
-            getState: () => this.captureState(context)
+            execute: () => self.captureState()
         });
-
+        
         if (node.body.type === 'BlockStatement') {
-            this.walkAST(node.body.body, context);
+            this.walkAST(node.body.body, lines);
         } else {
-            this.processNode(node.body, context);
+            this.processNode(node.body, lines);
         }
     }
 
     /**
      * Process if statements
      */
-    processIfStatement(node, context) {
+    processIfStatement(node, lines) {
+        const self = this;
+        const lineNum = node.loc.start.line;
+        const lineCode = lines[lineNum - 1] || '';
+        
         this.steps.push({
-            type: 'if-condition',
-            line: node.loc.start.line,
-            description: 'Evaluate if condition',
+            type: 'if-statement',
+            line: lineNum,
+            code: lineCode.trim(),
+            description: 'Evaluate condition',
             testNode: node.test,
-            action: () => {},
-            getState: () => this.captureState(context)
+            execute: () => self.captureState()
         });
-
+        
         // Process consequent
         if (node.consequent.type === 'BlockStatement') {
-            this.walkAST(node.consequent.body, context);
+            this.walkAST(node.consequent.body, lines);
         } else {
-            this.processNode(node.consequent, context);
+            this.processNode(node.consequent, lines);
         }
-
-        // Process alternate (else)
+        
+        // Process else
         if (node.alternate) {
-            if (node.alternate.type === 'BlockStatement') {
-                this.walkAST(node.alternate.body, context);
-            } else if (node.alternate.type === 'IfStatement') {
-                this.processIfStatement(node.alternate, context);
+            if (node.alternate.type === 'IfStatement') {
+                this.processIfStatement(node.alternate, lines);
+            } else if (node.alternate.type === 'BlockStatement') {
+                this.walkAST(node.alternate.body, lines);
             } else {
-                this.processNode(node.alternate, context);
+                this.processNode(node.alternate, lines);
             }
         }
     }
 
     /**
+     * Process function declarations
+     */
+    processFunctionDeclaration(node, lineNum, lineCode) {
+        const self = this;
+        const funcName = node.id.name;
+        const params = node.params.map(p => p.name);
+        
+        this.steps.push({
+            type: 'function-declaration',
+            line: lineNum,
+            code: lineCode.trim(),
+            description: `Define function ${funcName}(${params.join(', ')})`,
+            execute: () => {
+                self.executionContext.functions[funcName] = {
+                    params: params,
+                    body: node.body,
+                    node: node
+                };
+                return self.captureState();
+            }
+        });
+    }
+
+    /**
      * Process return statements
      */
-    processReturnStatement(node, context, parentFunction) {
+    processReturnStatement(node, lineNum, lineCode) {
+        const self = this;
+        
         this.steps.push({
             type: 'return',
-            line: node.loc.start.line,
-            description: `Return ${node.argument ? 'value' : ''}`,
-            action: () => {
-                return node.argument ? this.evaluateExpression(node.argument, context) : undefined;
-            },
-            getState: () => this.captureState(context)
+            line: lineNum,
+            code: lineCode.trim(),
+            description: 'Return from function',
+            execute: () => self.captureState()
         });
     }
 
     /**
-     * Process function calls
+     * Evaluate an expression
      */
-    processCallExpression(expr, node, context) {
-        let description = '';
-        let arrayOp = null;
-        
-        // Check for console.log
-        if (expr.callee.type === 'MemberExpression' && 
-            expr.callee.object.name === 'console') {
-            description = `console.${expr.callee.property.name}(...)`;
-        }
-        // Check for array methods
-        else if (expr.callee.type === 'MemberExpression') {
-            const objName = expr.callee.object.name;
-            const methodName = expr.callee.property.name;
-            arrayOp = { array: objName, method: methodName };
-            description = `${objName}.${methodName}(...)`;
-        }
-        // Regular function call
-        else if (expr.callee.type === 'Identifier') {
-            description = `Call ${expr.callee.name}(...)`;
-        }
-
-        this.steps.push({
-            type: 'function-call',
-            line: node.loc.start.line,
-            description: description,
-            arrayOperation: arrayOp,
-            action: () => {
-                this.evaluateExpression(expr, context);
-            },
-            getState: () => this.captureState(context)
-        });
-    }
-
-    /**
-     * Evaluate an expression and return its value
-     */
-    evaluateExpression(node, context) {
+    evaluate(node) {
         if (!node) return undefined;
-
+        
         switch (node.type) {
             case 'Literal':
                 return node.value;
-            
+                
             case 'Identifier':
-                const variable = context.variables.get(node.name);
-                return variable ? variable.value : undefined;
-            
+                const varData = this.executionContext.variables[node.name];
+                return varData ? varData.value : undefined;
+                
             case 'ArrayExpression':
-                return node.elements.map(el => this.evaluateExpression(el, context));
-            
+                return node.elements.map(el => this.evaluate(el));
+                
             case 'ObjectExpression':
                 const obj = {};
                 for (const prop of node.properties) {
                     const key = prop.key.name || prop.key.value;
-                    obj[key] = this.evaluateExpression(prop.value, context);
+                    obj[key] = this.evaluate(prop.value);
                 }
                 return obj;
-            
+                
             case 'BinaryExpression':
-                return this.evaluateBinaryExpression(node, context);
-            
-            case 'UnaryExpression':
-                return this.evaluateUnaryExpression(node, context);
-            
-            case 'UpdateExpression':
-                return this.evaluateUpdateExpression(node, context);
-            
-            case 'MemberExpression':
-                return this.evaluateMemberExpression(node, context);
-            
-            case 'CallExpression':
-                return this.evaluateCallExpression(node, context);
-            
-            case 'AssignmentExpression':
-                const value = this.evaluateExpression(node.right, context);
-                this.performAssignment(node.left, value, node.operator, context);
-                return value;
-            
-            case 'ConditionalExpression':
-                const test = this.evaluateExpression(node.test, context);
-                return test ? 
-                    this.evaluateExpression(node.consequent, context) : 
-                    this.evaluateExpression(node.alternate, context);
-            
+                return this.evaluateBinary(node);
+                
             case 'LogicalExpression':
-                return this.evaluateLogicalExpression(node, context);
-            
+                return this.evaluateLogical(node);
+                
+            case 'UnaryExpression':
+                return this.evaluateUnary(node);
+                
+            case 'UpdateExpression':
+                return this.evaluateUpdate(node);
+                
+            case 'AssignmentExpression':
+                return this.evaluateAssignment(node);
+                
+            case 'MemberExpression':
+                return this.evaluateMember(node);
+                
+            case 'CallExpression':
+                return this.evaluateCall(node);
+                
+            case 'ConditionalExpression':
+                const test = this.evaluate(node.test);
+                return test ? this.evaluate(node.consequent) : this.evaluate(node.alternate);
+                
             case 'NewExpression':
-                return this.evaluateNewExpression(node, context);
-            
+                return this.evaluateNew(node);
+                
             default:
                 return undefined;
         }
     }
 
     /**
-     * Evaluate binary expressions
+     * Evaluate binary expression
      */
-    evaluateBinaryExpression(node, context) {
-        const left = this.evaluateExpression(node.left, context);
-        const right = this.evaluateExpression(node.right, context);
+    evaluateBinary(node) {
+        const left = this.evaluate(node.left);
+        const right = this.evaluate(node.right);
         
         switch (node.operator) {
             case '+': return left + right;
@@ -463,16 +460,31 @@ class DSAInterpreter {
             case '^': return left ^ right;
             case '<<': return left << right;
             case '>>': return left >> right;
-            case '>>>': return left >>> right;
             default: return undefined;
         }
     }
 
     /**
-     * Evaluate unary expressions
+     * Evaluate logical expression
      */
-    evaluateUnaryExpression(node, context) {
-        const arg = this.evaluateExpression(node.argument, context);
+    evaluateLogical(node) {
+        const left = this.evaluate(node.left);
+        
+        if (node.operator === '&&') {
+            return left ? this.evaluate(node.right) : left;
+        } else if (node.operator === '||') {
+            return left ? left : this.evaluate(node.right);
+        } else if (node.operator === '??') {
+            return left != null ? left : this.evaluate(node.right);
+        }
+        return undefined;
+    }
+
+    /**
+     * Evaluate unary expression
+     */
+    evaluateUnary(node) {
+        const arg = this.evaluate(node.argument);
         
         switch (node.operator) {
             case '-': return -arg;
@@ -485,33 +497,103 @@ class DSAInterpreter {
     }
 
     /**
-     * Evaluate update expressions (++, --)
+     * Evaluate update expression (++, --)
      */
-    evaluateUpdateExpression(node, context) {
-        const varName = node.argument.name;
-        const variable = context.variables.get(varName);
+    evaluateUpdate(node) {
+        const name = node.argument.name;
+        const varData = this.executionContext.variables[name];
         
-        if (!variable) return undefined;
+        if (!varData) return undefined;
         
-        const oldValue = variable.value;
+        const oldValue = varData.value;
         const newValue = node.operator === '++' ? oldValue + 1 : oldValue - 1;
         
-        variable.value = newValue;
+        varData.value = newValue;
+        
+        // Update data structure
+        this.registerDataStructure(name, newValue);
         
         return node.prefix ? newValue : oldValue;
     }
 
     /**
-     * Evaluate member expressions (obj.prop, arr[i])
+     * Evaluate assignment expression
      */
-    evaluateMemberExpression(node, context) {
-        const obj = this.evaluateExpression(node.object, context);
+    evaluateAssignment(node) {
+        const value = this.evaluate(node.right);
+        
+        if (node.left.type === 'Identifier') {
+            const name = node.left.name;
+            let varData = this.executionContext.variables[name];
+            
+            if (!varData) {
+                varData = { value: undefined, type: 'undefined' };
+                this.executionContext.variables[name] = varData;
+            }
+            
+            switch (node.operator) {
+                case '=': varData.value = value; break;
+                case '+=': varData.value += value; break;
+                case '-=': varData.value -= value; break;
+                case '*=': varData.value *= value; break;
+                case '/=': varData.value /= value; break;
+                case '%=': varData.value %= value; break;
+            }
+            
+            varData.type = this.getType(varData.value);
+            varData.dsType = this.detectDataStructure(varData.value);
+            
+            // Update data structure
+            this.registerDataStructure(name, varData.value);
+            
+            return varData.value;
+            
+        } else if (node.left.type === 'MemberExpression') {
+            const obj = this.evaluate(node.left.object);
+            let prop;
+            
+            if (node.left.computed) {
+                prop = this.evaluate(node.left.property);
+            } else {
+                prop = node.left.property.name;
+            }
+            
+            if (obj !== undefined && obj !== null) {
+                switch (node.operator) {
+                    case '=': obj[prop] = value; break;
+                    case '+=': obj[prop] += value; break;
+                    case '-=': obj[prop] -= value; break;
+                    case '*=': obj[prop] *= value; break;
+                    case '/=': obj[prop] /= value; break;
+                }
+                
+                // Update parent array in data structures
+                if (node.left.object.type === 'Identifier') {
+                    const arrName = node.left.object.name;
+                    const arrData = this.executionContext.variables[arrName];
+                    if (arrData) {
+                        this.registerDataStructure(arrName, arrData.value);
+                    }
+                }
+            }
+            
+            return value;
+        }
+        
+        return value;
+    }
+
+    /**
+     * Evaluate member expression
+     */
+    evaluateMember(node) {
+        const obj = this.evaluate(node.object);
         
         if (obj === undefined || obj === null) return undefined;
         
         let prop;
         if (node.computed) {
-            prop = this.evaluateExpression(node.property, context);
+            prop = this.evaluate(node.property);
         } else {
             prop = node.property.name;
         }
@@ -520,32 +602,45 @@ class DSAInterpreter {
     }
 
     /**
-     * Evaluate call expressions
+     * Evaluate function call
      */
-    evaluateCallExpression(node, context) {
+    evaluateCall(node) {
         // Handle console methods
         if (node.callee.type === 'MemberExpression' && 
             node.callee.object.name === 'console') {
-            const args = node.arguments.map(arg => this.evaluateExpression(arg, context));
             const method = node.callee.property.name;
+            const args = node.arguments.map(arg => this.evaluate(arg));
             
-            this.consoleOutput.push({
-                type: method,
-                args: args,
-                message: args.map(a => this.formatValue(a)).join(' ')
-            });
-            
+            if (this.executionContext.console[method]) {
+                this.executionContext.console[method](...args);
+            }
             return undefined;
+        }
+        
+        // Handle Math methods
+        if (node.callee.type === 'MemberExpression' && 
+            node.callee.object.name === 'Math') {
+            const method = node.callee.property.name;
+            const args = node.arguments.map(arg => this.evaluate(arg));
+            return Math[method](...args);
         }
         
         // Handle array methods
         if (node.callee.type === 'MemberExpression') {
-            const obj = this.evaluateExpression(node.callee.object, context);
+            const obj = this.evaluate(node.callee.object);
             const method = node.callee.property.name;
-            const args = node.arguments.map(arg => this.evaluateExpression(arg, context));
+            const args = node.arguments.map(arg => this.evaluate(arg));
             
             if (Array.isArray(obj) && typeof obj[method] === 'function') {
-                return obj[method](...args);
+                const result = obj[method](...args);
+                
+                // Update the array in context
+                if (node.callee.object.type === 'Identifier') {
+                    const arrName = node.callee.object.name;
+                    this.registerDataStructure(arrName, obj);
+                }
+                
+                return result;
             }
             
             if (obj && typeof obj[method] === 'function') {
@@ -556,63 +651,36 @@ class DSAInterpreter {
         // Handle user-defined functions
         if (node.callee.type === 'Identifier') {
             const funcName = node.callee.name;
-            const func = context.functions.get(funcName);
+            const func = this.executionContext.functions[funcName];
             
             if (func) {
-                // Create new scope for function
-                const funcContext = {
-                    variables: new Map(context.variables),
-                    functions: context.functions,
-                    arrays: context.arrays
-                };
+                // Create new scope
+                const oldVars = { ...this.executionContext.variables };
                 
                 // Bind parameters
-                const args = node.arguments.map(arg => this.evaluateExpression(arg, context));
+                const args = node.arguments.map(arg => this.evaluate(arg));
                 func.params.forEach((param, i) => {
-                    funcContext.variables.set(param, {
+                    this.executionContext.variables[param] = {
                         value: args[i],
-                        type: typeof args[i]
-                    });
+                        type: this.getType(args[i])
+                    };
                 });
                 
-                // Note: Simplified - in real implementation would need proper execution
+                // Note: Simplified execution - full implementation would need call stack
                 return undefined;
             }
-            
-            // Handle built-in functions
-            if (funcName === 'Math') {
-                // Handle Math functions
-            }
         }
         
         return undefined;
     }
 
     /**
-     * Evaluate logical expressions
+     * Evaluate new expression
      */
-    evaluateLogicalExpression(node, context) {
-        const left = this.evaluateExpression(node.left, context);
-        
-        if (node.operator === '&&') {
-            return left ? this.evaluateExpression(node.right, context) : left;
-        } else if (node.operator === '||') {
-            return left ? left : this.evaluateExpression(node.right, context);
-        } else if (node.operator === '??') {
-            return left !== null && left !== undefined ? left : this.evaluateExpression(node.right, context);
-        }
-        
-        return undefined;
-    }
-
-    /**
-     * Evaluate new expressions
-     */
-    evaluateNewExpression(node, context) {
+    evaluateNew(node) {
         const className = node.callee.name;
-        const args = node.arguments.map(arg => this.evaluateExpression(arg, context));
+        const args = node.arguments.map(arg => this.evaluate(arg));
         
-        // Handle common data structure classes
         switch (className) {
             case 'ListNode':
                 return { val: args[0], next: args[1] || null };
@@ -625,206 +693,147 @@ class DSAInterpreter {
             case 'Array':
                 return new Array(...args);
             default:
-                return { __class__: className, ...args };
+                return { __class__: className };
         }
     }
 
     /**
-     * Perform assignment operation
+     * Capture current execution state
      */
-    performAssignment(left, value, operator, context) {
-        if (left.type === 'Identifier') {
-            const varName = left.name;
-            let variable = context.variables.get(varName);
-            
-            if (!variable) {
-                variable = { value: undefined, type: 'undefined' };
-                context.variables.set(varName, variable);
-            }
-            
-            switch (operator) {
-                case '=': variable.value = value; break;
-                case '+=': variable.value += value; break;
-                case '-=': variable.value -= value; break;
-                case '*=': variable.value *= value; break;
-                case '/=': variable.value /= value; break;
-                case '%=': variable.value %= value; break;
-            }
-            
-            variable.type = typeof variable.value;
-            
-            // Update data structure type detection
-            const dsType = this.detectDataStructure(null, variable.value);
-            if (dsType) {
-                variable.dsType = dsType;
-                this.registerDataStructure(varName, dsType, variable.value, context);
-            }
-        } else if (left.type === 'MemberExpression') {
-            const obj = this.evaluateExpression(left.object, context);
-            let prop;
-            
-            if (left.computed) {
-                prop = this.evaluateExpression(left.property, context);
-            } else {
-                prop = left.property.name;
-            }
-            
-            if (obj !== undefined && obj !== null) {
-                switch (operator) {
-                    case '=': obj[prop] = value; break;
-                    case '+=': obj[prop] += value; break;
-                    case '-=': obj[prop] -= value; break;
-                    case '*=': obj[prop] *= value; break;
-                    case '/=': obj[prop] /= value; break;
-                    case '%=': obj[prop] %= value; break;
-                }
-            }
-        }
-    }
-
-    /**
-     * Detect data structure type from expression or value
-     */
-    detectDataStructure(node, value) {
-        // Array detection
-        if (Array.isArray(value)) {
-            return 'array';
-        }
-        
-        // Object-based detection
-        if (value && typeof value === 'object') {
-            // Linked List node
-            if ('val' in value && 'next' in value) {
-                return 'linkedlist';
-            }
-            // Tree node
-            if ('val' in value && ('left' in value || 'right' in value)) {
-                return 'tree';
-            }
-            // Graph (adjacency list)
-            if (Object.values(value).every(v => Array.isArray(v))) {
-                return 'graph';
-            }
-        }
-        
-        return null;
-    }
-
-    /**
-     * Register a data structure for visualization
-     */
-    registerDataStructure(name, type, value, context) {
-        switch (type) {
-            case 'array':
-                context.arrays.set(name, value);
-                break;
-            case 'linkedlist':
-                context.linkedLists.set(name, value);
-                break;
-            case 'tree':
-                context.trees.set(name, value);
-                break;
-            case 'graph':
-                context.graphs.set(name, value);
-                break;
-        }
-    }
-
-    /**
-     * Capture current state for visualization
-     */
-    captureState(context) {
+    captureState() {
         const state = {
             variables: {},
             arrays: {},
             linkedLists: {},
             trees: {},
+            graphs: {},
             stacks: {},
             queues: {},
-            graphs: {},
             heaps: {},
             console: [...this.consoleOutput]
         };
-
+        
         // Copy variables
-        for (const [name, data] of context.variables) {
+        for (const [name, data] of Object.entries(this.executionContext.variables)) {
             state.variables[name] = {
                 value: this.cloneValue(data.value),
                 type: data.type,
                 dsType: data.dsType
             };
-            
-            // Also add to appropriate data structure category
-            if (data.dsType === 'array') {
-                state.arrays[name] = this.cloneValue(data.value);
-            }
         }
-
-        // Copy registered data structures
-        for (const [name, value] of context.arrays) {
-            state.arrays[name] = this.cloneValue(value);
-        }
-        for (const [name, value] of context.linkedLists) {
-            state.linkedLists[name] = this.cloneValue(value);
-        }
-        for (const [name, value] of context.trees) {
-            state.trees[name] = this.cloneValue(value);
-        }
-        for (const [name, value] of context.graphs) {
-            state.graphs[name] = this.cloneValue(value);
-        }
-
+        
+        // Copy data structures
+        state.arrays = this.cloneValue(this.dataStructures.arrays);
+        state.linkedLists = this.cloneValue(this.dataStructures.linkedLists);
+        state.trees = this.cloneValue(this.dataStructures.trees);
+        state.graphs = this.cloneValue(this.dataStructures.graphs);
+        state.stacks = this.cloneValue(this.dataStructures.stacks);
+        state.queues = this.cloneValue(this.dataStructures.queues);
+        state.heaps = this.cloneValue(this.dataStructures.heaps);
+        
         return state;
     }
 
     /**
-     * Get assignment target name
+     * Register data structure for visualization
      */
-    getAssignmentTarget(node) {
-        if (node.type === 'Identifier') {
-            return { type: 'variable', name: node.name };
-        } else if (node.type === 'MemberExpression') {
-            return { 
-                type: 'member', 
-                object: node.object.name,
-                property: node.computed ? 'computed' : node.property.name
-            };
+    registerDataStructure(name, value) {
+        if (!value) return;
+        
+        // Array detection
+        if (Array.isArray(value)) {
+            this.dataStructures.arrays[name] = this.cloneValue(value);
+        }
+        // Linked List detection
+        else if (value && typeof value === 'object' && 'next' in value && 'val' in value) {
+            this.dataStructures.linkedLists[name] = this.cloneValue(value);
+        }
+        // Tree detection
+        else if (value && typeof value === 'object' && 'val' in value && ('left' in value || 'right' in value)) {
+            this.dataStructures.trees[name] = this.cloneValue(value);
+        }
+        // Graph detection (adjacency list)
+        else if (value && typeof value === 'object' && !Array.isArray(value)) {
+            const values = Object.values(value);
+            if (values.length > 0 && values.every(v => Array.isArray(v))) {
+                this.dataStructures.graphs[name] = this.cloneValue(value);
+            }
+        }
+    }
+
+    /**
+     * Detect data structure type
+     */
+    detectDataStructure(value) {
+        if (Array.isArray(value)) return 'array';
+        if (value && typeof value === 'object') {
+            if ('next' in value && 'val' in value) return 'linkedlist';
+            if ('val' in value && ('left' in value || 'right' in value)) return 'tree';
+            const vals = Object.values(value);
+            if (vals.length > 0 && vals.every(v => Array.isArray(v))) return 'graph';
         }
         return null;
     }
 
     /**
-     * Generate description for assignment
+     * Get type of value
      */
-    generateAssignmentDescription(expr, context) {
-        const left = this.formatNode(expr.left);
-        const right = this.formatNode(expr.right);
-        return `${left} ${expr.operator} ${right}`;
+    getType(value) {
+        if (Array.isArray(value)) return 'array';
+        if (value === null) return 'null';
+        return typeof value;
     }
 
     /**
-     * Format AST node for display
+     * Describe assignment operation
      */
-    formatNode(node) {
-        if (!node) return '';
-        
-        switch (node.type) {
-            case 'Identifier':
-                return node.name;
-            case 'Literal':
-                return String(node.value);
-            case 'MemberExpression':
-                if (node.computed) {
-                    return `${this.formatNode(node.object)}[${this.formatNode(node.property)}]`;
+    describeAssignment(expr) {
+        if (expr.left.type === 'Identifier') {
+            return `Assign to ${expr.left.name}`;
+        } else if (expr.left.type === 'MemberExpression') {
+            if (expr.left.object.type === 'Identifier') {
+                const objName = expr.left.object.name;
+                if (expr.left.computed) {
+                    return `Update ${objName}[...]`;
+                } else {
+                    return `Update ${objName}.${expr.left.property.name}`;
                 }
-                return `${this.formatNode(node.object)}.${node.property.name}`;
-            case 'BinaryExpression':
-                return `${this.formatNode(node.left)} ${node.operator} ${this.formatNode(node.right)}`;
-            case 'ArrayExpression':
-                return `[${node.elements.map(e => this.formatNode(e)).join(', ')}]`;
-            default:
-                return '...';
+            }
         }
+        return 'Assignment';
+    }
+
+    /**
+     * Get highlights for assignment
+     */
+    getAssignmentHighlights(expr) {
+        if (expr.left.type === 'MemberExpression' && 
+            expr.left.object.type === 'Identifier' &&
+            expr.left.computed) {
+            return {
+                array: expr.left.object.name,
+                type: 'assignment'
+            };
+        }
+        return {};
+    }
+
+    /**
+     * Describe function call
+     */
+    describeCall(expr) {
+        if (expr.callee.type === 'MemberExpression') {
+            if (expr.callee.object.name === 'console') {
+                return `console.${expr.callee.property.name}()`;
+            }
+            if (expr.callee.object.type === 'Identifier') {
+                return `${expr.callee.object.name}.${expr.callee.property.name}()`;
+            }
+        }
+        if (expr.callee.type === 'Identifier') {
+            return `Call ${expr.callee.name}()`;
+        }
+        return 'Function call';
     }
 
     /**
@@ -855,23 +864,11 @@ class DSAInterpreter {
         
         const clone = {};
         for (const key in value) {
-            clone[key] = this.cloneValue(value[key]);
+            if (value.hasOwnProperty(key)) {
+                clone[key] = this.cloneValue(value[key]);
+            }
         }
         return clone;
-    }
-
-    /**
-     * Execute all steps and return final state
-     */
-    executeAll(context) {
-        const states = [];
-        
-        for (const step of this.steps) {
-            step.action();
-            states.push(step.getState());
-        }
-        
-        return states;
     }
 
     /**
@@ -892,5 +889,5 @@ class DSAInterpreter {
     }
 }
 
-// Export for use in visualizer
+// Export
 window.DSAInterpreter = DSAInterpreter;

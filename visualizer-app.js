@@ -240,33 +240,36 @@ class VisualizerApp {
         this.states = [];
         this.currentStep = 0;
         
-        // Create execution context
-        const context = {
-            variables: new Map(),
-            functions: new Map(),
-            arrays: new Map(),
-            linkedLists: new Map(),
-            trees: new Map(),
-            graphs: new Map()
-        };
+        // Clear console output tracking
+        document.getElementById('consoleOutput').innerHTML = 
+            '<div class="console-welcome"><span class="console-line">// Console output</span></div>';
         
         // Execute each step and capture state
         const steps = this.interpreter.steps;
+        let lastConsoleLength = 0;
         
         for (let i = 0; i < steps.length; i++) {
             const step = steps[i];
             
             try {
-                // Execute the step action
-                step.action();
+                // Execute the step and get state snapshot
+                const state = step.execute();
                 
-                // Get state snapshot
-                const state = step.getState();
+                // Add step info to state
                 state.stepInfo = {
                     type: step.type,
                     line: step.line,
+                    code: step.code,
                     description: step.description
                 };
+                
+                // Track new console messages for this step
+                if (state.console && state.console.length > lastConsoleLength) {
+                    state.newConsoleMessages = state.console.slice(lastConsoleLength);
+                    lastConsoleLength = state.console.length;
+                } else {
+                    state.newConsoleMessages = [];
+                }
                 
                 this.states.push(state);
                 
@@ -279,8 +282,10 @@ class VisualizerApp {
                     stepInfo: {
                         type: step.type,
                         line: step.line,
+                        code: step.code || '',
                         description: step.description + ' (error)'
-                    }
+                    },
+                    newConsoleMessages: []
                 });
             }
         }
@@ -303,13 +308,16 @@ class VisualizerApp {
         // Highlight current line in editor
         this.highlightLine(state.stepInfo.line);
         
-        // Create step info display
+        // Create step info display with code preview
         const stepInfo = document.createElement('div');
         stepInfo.className = 'step-info';
         stepInfo.innerHTML = `
-            <div class="step-description">
-                <strong>Step ${this.currentStep + 1}:</strong> ${state.stepInfo.description}
+            <div class="step-header">
+                <span class="step-number">Step ${this.currentStep + 1}</span>
+                <span class="step-type">${state.stepInfo.type}</span>
             </div>
+            <div class="step-code">${this.escapeHtml(state.stepInfo.code || '')}</div>
+            <div class="step-description">${state.stepInfo.description}</div>
         `;
         canvas.appendChild(stepInfo);
         
@@ -319,15 +327,24 @@ class VisualizerApp {
         // Update variable inspector
         this.updateVariableInspector(state.variables);
         
-        // Update console
-        if (state.console && state.console.length > 0) {
-            state.console.forEach(log => {
+        // Show new console messages for this step
+        if (state.newConsoleMessages && state.newConsoleMessages.length > 0) {
+            state.newConsoleMessages.forEach(log => {
                 this.logToConsole(log.message, log.type);
             });
         }
         
         // Update progress
         this.updateProgress();
+    }
+
+    /**
+     * Escape HTML to prevent XSS
+     */
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     /**
@@ -764,13 +781,50 @@ appStyles.textContent = `
         background: var(--bg-secondary);
         border: 1px solid var(--border-color);
         border-radius: 8px;
-        padding: 12px 16px;
+        padding: 16px;
         margin-bottom: 20px;
     }
     
-    .step-description {
-        font-size: 14px;
+    .step-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+    
+    .step-number {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--accent-primary);
+        background: rgba(88, 166, 255, 0.15);
+        padding: 4px 10px;
+        border-radius: 12px;
+    }
+    
+    .step-type {
+        font-size: 11px;
+        color: var(--text-muted);
+        background: var(--bg-tertiary);
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .step-code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
         color: var(--text-primary);
+        background: var(--bg-primary);
+        padding: 10px 12px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        border-left: 3px solid var(--accent-primary);
+        overflow-x: auto;
+    }
+    
+    .step-description {
+        font-size: 13px;
+        color: var(--text-secondary);
     }
     
     .step-description strong {
@@ -778,7 +832,7 @@ appStyles.textContent = `
     }
     
     .line-highlight {
-        background: rgba(88, 166, 255, 0.1) !important;
+        background: rgba(88, 166, 255, 0.15) !important;
     }
     
     .line-decoration {
