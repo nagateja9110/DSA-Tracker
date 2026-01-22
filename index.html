@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Progress Tracker | FANG Interview Prep</title>
+    <meta name="description" content="Track your DSA preparation progress for FANG interviews - 1200+ problems organized by topics">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="hamburger-btn" id="hamburgerBtn" title="Toggle Menu">☰</button>
+                <h1 class="logo">🚀 DSA Tracker</h1>
+                <span class="tagline">FANG Interview Prep</span>
+            </div>
+            <div class="header-center">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search problems... (Press /)" class="search-input">
+                </div>
+                <!-- Company Filter -->
+                <div class="company-filter">
+                    <select id="companyFilter" class="company-select">
+                        <option value="all">All Companies</option>
+                    </select>
+                </div>
+            </div>
+            <div class="header-right">
+                <!-- Daily Goal Widget -->
+                <div class="goal-widget" id="goalWidget" title="Daily Goal">
+                    <div class="goal-ring">
+                        <svg viewBox="0 0 36 36" class="circular-chart">
+                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            <path class="circle" id="goalProgress" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                        </svg>
+                        <span class="goal-text" id="goalText">0/5</span>
+                    </div>
+                    <div class="streak-badge" id="streakBadge" title="Current Streak">🔥 0</div>
+                </div>
+                <div class="stats-mini">
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalCompleted">0</span>
+                        <span class="stat-label">Solved</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalStarred">0</span>
+                        <span class="stat-label">Starred</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalTodo">0</span>
+                        <span class="stat-label">To-Do</span>
+                    </div>
+                </div>
+                <button class="btn-icon" id="statsBtn" title="Statistics (S)">📊</button>
+                <button class="btn-icon" id="themeBtn" title="Toggle Theme (T)">🌙</button>
+                <button class="btn-icon" id="shortcutsBtn" title="Keyboard Shortcuts (?)">⌨️</button>
+                <button class="btn-icon" id="exportBtn" title="Export/Import Data">💾</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Quick Filters</h3>
+                    <button class="filter-btn active" data-filter="all">
+                        <span class="filter-icon">📚</span>
+                        <span>All Problems</span>
+                        <span class="filter-count" id="countAll">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="starred">
+                        <span class="filter-icon">⭐</span>
+                        <span>Starred</span>
+                        <span class="filter-count" id="countStarred">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="todo">
+                        <span class="filter-icon">📋</span>
+                        <span>To-Do List</span>
+                        <span class="filter-count" id="countTodo">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="completed">
+                        <span class="filter-icon">✅</span>
+                        <span>Completed</span>
+                        <span class="filter-count" id="countCompleted">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="pending">
+                        <span class="filter-icon">⏳</span>
+                        <span>Pending</span>
+                        <span class="filter-count" id="countPending">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="revision">
+                        <span class="filter-icon">🔄</span>
+                        <span>Needs Revision</span>
+                        <span class="filter-count" id="countRevision">0</span>
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Difficulty</h3>
+                    <div class="diff-buttons">
+                        <button class="diff-btn active" data-difficulty="all">All</button>
+                        <button class="diff-btn" data-difficulty="Easy">🟢 Easy</button>
+                        <button class="diff-btn" data-difficulty="Medium">🟡 Medium</button>
+                        <button class="diff-btn" data-difficulty="Hard">🔴 Hard</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section domains-section">
+                    <h3 class="sidebar-title">Topics</h3>
+                    <div class="domains-list" id="domainsList">
+                        <!-- Domains will be populated by JS -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Panel -->
+            <main class="main-panel">
+                <!-- Domain Header -->
+                <div class="domain-header" id="domainHeader">
+                    <div class="domain-info">
+                        <h2 class="domain-title" id="domainTitle">📚 All Problems</h2>
+                        <p class="domain-subtitle" id="domainSubtitle">Track your DSA preparation progress</p>
+                    </div>
+                    <div class="domain-progress">
+                        <div class="progress-stats">
+                            <span class="progress-text" id="progressText">0/0 completed</span>
+                            <span class="progress-percent" id="progressPercent">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Problems Table -->
+                <div class="problems-container">
+                    <table class="problems-table">
+                        <thead>
+                            <tr>
+                                <th class="th-status">Done</th>
+                                <th class="th-star">Star</th>
+                                <th class="th-todo">To-Do</th>
+                                <th class="th-name">Problem</th>
+                                <th class="th-difficulty">Difficulty</th>
+                                <th class="th-pattern">Pattern</th>
+                                <th class="th-companies">Companies</th>
+                                <th class="th-links">Links</th>
+                                <th class="th-notes">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="problemsTableBody">
+                            <!-- Problems will be populated by JS -->
+                        </tbody>
+                    </table>
+                    <div class="no-results" id="noResults" style="display: none;">
+                        <span class="no-results-icon">🔍</span>
+                        <p>No problems found matching your criteria</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Export/Import Modal -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💾 Export / Import Progress</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h4>Export Progress</h4>
+                    <p>Download your progress as a JSON file</p>
+                    <button class="btn-primary" id="downloadBtn">📥 Download JSON</button>
+                </div>
+                <div class="modal-section">
+                    <h4>Import Progress</h4>
+                    <p>Upload a previously exported JSON file</p>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                    <button class="btn-secondary" id="importBtn">📤 Upload JSON</button>
+                </div>
+                <div class="modal-section">
+                    <h4>Reset All Progress</h4>
+                    <p>Clear all your progress data</p>
+                    <button class="btn-danger" id="resetBtn">🗑️ Reset All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Modal -->
+    <div class="modal" id="notesModal">
+        <div class="modal-content modal-notes">
+            <div class="modal-header">
+                <h3>📝 Problem Notes</h3>
+                <button class="modal-close" id="notesModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4 id="notesProblemName"></h4>
+                <textarea id="notesTextarea" placeholder="Add your notes, approach, or key insights here..."></textarea>
+                <div class="notes-actions">
+                    <button class="btn-secondary" id="notesCancelBtn">Cancel</button>
+                    <button class="btn-primary" id="notesSaveBtn">💾 Save Notes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div class="modal" id="statsModal">
+        <div class="modal-content modal-stats">
+            <div class="modal-header">
+                <h3>📊 Statistics Dashboard</h3>
+                <button class="modal-close" id="statsModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>Overall Progress</h4>
+                        <div class="big-stat" id="statOverall">0%</div>
+                        <p id="statOverallText">0 of 0 problems solved</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Current Streak</h4>
+                        <div class="big-stat">🔥 <span id="statStreak">0</span></div>
+                        <p>days in a row</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Today's Progress</h4>
+                        <div class="big-stat" id="statToday">0</div>
+                        <p>problems solved today</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Daily Goal</h4>
+                        <div class="goal-setting">
+                            <button class="goal-btn" id="goalMinus">-</button>
+                            <span id="dailyGoalValue">5</span>
+                            <button class="goal-btn" id="goalPlus">+</button>
+                        </div>
+                        <p>problems per day</p>
+                    </div>
+                </div>
+                <div class="stats-section">
+                    <h4>Progress by Difficulty</h4>
+                    <div class="difficulty-bars">
+                        <div class="diff-bar-row">
+                            <span class="diff-label">Easy</span>
+                            <div class="diff-bar-container">
+                                <div class="diff-bar easy" id="barEasy"></div>
+                            </div>
+                            <span class="diff-count" id="countEasyStats">0/0</span>
+                        </div>
+                        <div class="diff-bar-row">
+                            <span class="diff-label">Medium</span>
+                            <div class="diff-bar-container">
+                                <div class="diff-bar medium" id="barMedium"></div>
+                            </div>
+                            <span class="diff-count" id="countMediumStats">0/0</span>
+                        </div>
+                        <div class="diff-bar-row">
+                            <span class="diff-label">Hard</span>
+                            <div class="diff-bar-container">
+                                <div class="diff-bar hard" id="barHard"></div>
+                            </div>
+                            <span class="diff-count" id="countHardStats">0/0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-section">
+                    <h4>Weak Areas (Patterns with &lt;30% completion)</h4>
+                    <div class="weak-areas" id="weakAreas">
+                        <p class="no-weak">🎉 No weak areas detected!</p>
+                    </div>
+                </div>
+                <div class="stats-section">
+                    <h4>Top Companies</h4>
+                    <div class="company-stats" id="companyStats">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div class="modal" id="shortcutsModal">
+        <div class="modal-content modal-shortcuts">
+            <div class="modal-header">
+                <h3>⌨️ Keyboard Shortcuts</h3>
+                <button class="modal-close" id="shortcutsModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="shortcuts-grid">
+                    <div class="shortcut-item">
+                        <kbd>j</kbd> / <kbd>↓</kbd>
+                        <span>Next problem</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>k</kbd> / <kbd>↑</kbd>
+                        <span>Previous problem</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>Space</kbd>
+                        <span>Toggle completed</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>s</kbd>
+                        <span>Toggle starred</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>t</kbd>
+                        <span>Toggle to-do</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>n</kbd>
+                        <span>Open notes</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>Enter</kbd>
+                        <span>Open in LeetCode</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>/</kbd>
+                        <span>Focus search</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>Esc</kbd>
+                        <span>Close modal / Clear focus</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>d</kbd>
+                        <span>Toggle theme</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>?</kbd>
+                        <span>Show shortcuts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
