@@ -10,51 +10,92 @@ const domains = {
         "name": "Two Sum",
         "difficulty": "Easy",
         "pattern": "Hash Map",
-        "companies": [
-          "Google",
-          "Amazon",
-          "Meta",
-          "Apple"
-        ],
+        "companies": ["Google", "Amazon", "Meta", "Apple"],
         "leetcode": "https://leetcode.com/problems/two-sum/",
         "gfg": "https://practice.geeksforgeeks.org/problems/key-pair5616/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
+        "examples": [
+          {
+            "input": "nums = [2,7,11,15], target = 9",
+            "output": "[0,1]",
+            "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]."
+          },
+          {
+            "input": "nums = [3,2,4], target = 6",
+            "output": "[1,2]"
+          },
+          {
+            "input": "nums = [3,3], target = 6",
+            "output": "[0,1]"
+          }
+        ],
+        "constraints": [
+          "2 <= nums.length <= 104",
+          "-109 <= nums[i] <= 109",
+          "-109 <= target <= 109",
+          "Only one valid answer exists."
+        ]
       },
       {
         "id": 2,
         "name": "Contains Duplicate",
         "difficulty": "Easy",
         "pattern": "Hash Set",
-        "companies": [
-          "Amazon",
-          "Google",
-          "Meta",
-          "Microsoft"
-        ],
+        "companies": ["Amazon", "Google", "Meta", "Microsoft"],
         "leetcode": "https://leetcode.com/problems/contains-duplicate/",
         "gfg": "https://practice.geeksforgeeks.org/problems/contains-duplicate/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer array nums, return true if any value appears at least twice in the array, and return false if every element is distinct.",
+        "examples": [
+          {
+            "input": "nums = [1,2,3,1]",
+            "output": "true"
+          },
+          {
+            "input": "nums = [1,2,3,4]",
+            "output": "false"
+          },
+          {
+            "input": "nums = [1,1,1,3,3,4,3,2,4,2]",
+            "output": "true"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 105",
+          "-109 <= nums[i] <= 109"
+        ]
       },
       {
         "id": 3,
         "name": "Valid Anagram",
         "difficulty": "Easy",
         "pattern": "Hash Map",
-        "companies": [
-          "Amazon",
-          "Microsoft",
-          "Google",
-          "Meta"
-        ],
+        "companies": ["Amazon", "Microsoft", "Google", "Meta"],
         "leetcode": "https://leetcode.com/problems/valid-anagram/",
         "gfg": "https://practice.geeksforgeeks.org/problems/anagram-1587115620/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given two strings s and t, return true if t is an anagram of s, and false otherwise.\n\nAn Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.",
+        "examples": [
+          {
+            "input": "s = \"anagram\", t = \"nagaram\"",
+            "output": "true"
+          },
+          {
+            "input": "s = \"rat\", t = \"car\"",
+            "output": "false"
+          }
+        ],
+        "constraints": [
+          "1 <= s.length, t.length <= 5 * 104",
+          "s and t consist of lowercase English letters."
+        ]
       },
       {
         "id": 4,

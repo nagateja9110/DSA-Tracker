@@ -287,7 +287,7 @@ function renderProblems() {
                 </button>
             </td>
             <td>
-                <span class="problem-name">${problem.name}</span>
+                <span class="problem-name problem-link" data-domain="${problem.domainKey}" data-id="${problem.id}">${problem.name}</span>
             </td>
             <td>
                 <span class="difficulty-badge ${problem.difficulty.toLowerCase()}">${problem.difficulty}</span>
@@ -320,6 +320,7 @@ function renderProblems() {
     tbody.querySelectorAll('.star-btn').forEach(btn => btn.addEventListener('click', handleStarClick));
     tbody.querySelectorAll('.todo-btn').forEach(btn => btn.addEventListener('click', handleTodoClick));
     tbody.querySelectorAll('.notes-btn').forEach(btn => btn.addEventListener('click', handleNotesClick));
+    tbody.querySelectorAll('.problem-link').forEach(span => span.addEventListener('click', handleProblemClick));
     tbody.querySelectorAll('tr').forEach(row => {
         row.addEventListener('click', (e) => {
             if (!e.target.closest('button') && !e.target.closest('input') && !e.target.closest('a')) {
@@ -817,3 +818,84 @@ function setupEventListeners() {
         });
     });
 }
+
+// Handle problem name click (open modal)
+function handleProblemClick(e) {
+    if (e) e.stopPropagation();
+    const span = e.currentTarget;
+    const domainKey = span.dataset.domain;
+    const id = parseInt(span.dataset.id);
+    const problem = domains[domainKey].problems.find(p => p.id === id);
+    
+    if (problem) {
+        openProblemModal(problem);
+    }
+}
+
+// Open Problem Modal
+function openProblemModal(problem) {
+    // Populate Modal Data
+    document.getElementById('problemModalTitle').textContent = problem.name;
+    
+    const diffBadge = document.getElementById('problemModalDifficulty');
+    diffBadge.textContent = problem.difficulty;
+    diffBadge.className = 'badge ' + problem.difficulty; // fix template literal syntax if needed
+    
+    document.getElementById('problemModalPattern').textContent = problem.pattern;
+    
+    // Links
+    document.getElementById('leetcodeLink').href = problem.leetcode || '#';
+    document.getElementById('leetcodeLink').style.display = problem.leetcode ? 'inline-flex' : 'none';
+    
+    document.getElementById('gfgLink').href = problem.gfg || '#';
+    document.getElementById('gfgLink').style.display = problem.gfg ? 'inline-flex' : 'none';
+    
+    // Description, Examples, Constraints
+    const descEl = document.getElementById('problemDescription');
+    const examplesEl = document.getElementById('problemExamples');
+    const constraintsEl = document.getElementById('problemConstraints');
+    
+    if (problem.description) {
+        descEl.innerHTML = problem.description.replace(/\n\n/g, '<br><br>').replace(/\n/g, ' ');
+    } else {
+        descEl.innerHTML = '<p class="text-muted">Description not available for this problem yet. (Sample data only for top 3 problems)</p>';
+    }
+    
+    if (problem.examples && problem.examples.length > 0) {
+        examplesEl.innerHTML = problem.examples.map((ex, i) => `
+            <div class="example">
+                <h4>Example ${i + 1}:</h4>
+                <div class="example-content">
+                    <p><strong>Input:</strong> ${ex.input}</p>
+                    <p><strong>Output:</strong> ${ex.output}</p>
+                    ${ex.explanation ? `<p><strong>Explanation:</strong> ${ex.explanation}</p>` : ''}
+                </div>
+            </div>
+        `).join('');
+    } else {
+        examplesEl.innerHTML = '';
+    }
+    
+    if (problem.constraints && problem.constraints.length > 0) {
+        constraintsEl.innerHTML = problem.constraints.map(c => `<li>${c}</li>`).join('');
+        document.querySelector('.problem-constraints').style.display = 'block';
+    } else {
+        constraintsEl.innerHTML = '';
+        document.querySelector('.problem-constraints').style.display = 'none';
+    }
+    
+    // Show Modal
+    document.getElementById('problemModal').classList.add('show');
+}
+
+// Setup Problem Modal Listeners
+document.getElementById('problemModalClose').addEventListener('click', () => {
+    document.getElementById('problemModal').classList.remove('show');
+});
+
+// Close modal if clicking outside
+document.getElementById('problemModal').addEventListener('click', (e) => {
+    if (e.target.id === 'problemModal') {
+        document.getElementById('problemModal').classList.remove('show');
+    }
+});

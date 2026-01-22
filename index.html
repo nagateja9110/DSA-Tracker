@@ -214,6 +214,46 @@
         </div>
     </div>
 
+    <!-- Problem Details Modal -->
+    <div class="modal" id="problemModal">
+        <div class="modal-content modal-problem">
+            <div class="modal-header">
+                <div class="problem-header-left">
+                    <h3 id="problemModalTitle">Problem Name</h3>
+                    <div class="problem-badges">
+                        <span id="problemModalDifficulty" class="badge">Difficulty</span>
+                        <span id="problemModalPattern" class="badge">Pattern</span>
+                    </div>
+                </div>
+                <button class="modal-close" id="problemModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="problem-content">
+                    <div class="problem-description" id="problemDescription">
+                        <!-- Description will be populated here -->
+                    </div>
+                    
+                    <div class="problem-examples" id="problemExamples">
+                        <!-- Examples will be populated here -->
+                    </div>
+                    
+                    <div class="problem-constraints">
+                        <h4>Constraints:</h4>
+                        <ul id="problemConstraints">
+                            <!-- Constraints will be populated here -->
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="problem-actions">
+                    <a href="#" target="_blank" class="btn-primary" id="leetcodeLink">Solve on LeetCode</a>
+                    <a href="#" target="_blank" class="btn-secondary" id="gfgLink">Solve on GFG</a>
+                    <a href="visualizer.html" class="btn-visualize" id="visualizeLink">🔬 Visualize Code</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Statistics Modal -->
     <div class="modal" id="statsModal">
         <div class="modal-content modal-stats">
