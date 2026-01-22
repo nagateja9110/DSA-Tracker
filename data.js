@@ -112,7 +112,23 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/stock-buy-and-sell-1587115621/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "You are given an array prices where prices[i] is the price of a given stock on the ith day.\n\nYou want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.\n\nReturn the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.",
+        "examples": [
+          {
+            "input": "prices = [7,1,5,3,6,4]",
+            "output": "5",
+            "explanation": "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5."
+          },
+          {
+            "input": "prices = [7,6,4,3,1]",
+            "output": "0"
+          }
+        ],
+        "constraints": [
+          "1 <= prices.length <= 105",
+          "0 <= prices[i] <= 104"
+        ]
       },
       {
         "id": 5,
@@ -129,7 +145,27 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/kadanes-algorithm-1587115620/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer array nums, find the subarray with the largest sum, and return its sum.",
+        "examples": [
+          {
+            "input": "nums = [-2,1,-3,4,-1,2,1,-5,4]",
+            "output": "6",
+            "explanation": "The subarray [4,-1,2,1] has the largest sum 6."
+          },
+          {
+            "input": "nums = [1]",
+            "output": "1"
+          },
+          {
+            "input": "nums = [5,4,-1,7,8]",
+            "output": "23"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 105",
+          "-104 <= nums[i] <= 104"
+        ]
       },
       {
         "id": 6,
@@ -146,7 +182,22 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/move-all-zeroes-to-end-of-array0751/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements.\n\nNote that you must do this in-place without making a copy of the array.",
+        "examples": [
+          {
+            "input": "nums = [0,1,0,3,12]",
+            "output": "[1,3,12,0,0]"
+          },
+          {
+            "input": "nums = [0]",
+            "output": "[0]"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 104",
+          "-231 <= nums[i] <= 231 - 1"
+        ]
       },
       {
         "id": 7,
@@ -162,7 +213,28 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/plus-one/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "You are given a large integer represented as an integer array digits, where each digits[i] is the ith digit of the integer. The digits are ordered from most significant to least significant in left-to-right order. The large integer does not contain any leading 0's.\n\nIncrement the large integer by one and return the resulting array of digits.",
+        "examples": [
+          {
+            "input": "digits = [1,2,3]",
+            "output": "[1,2,4]",
+            "explanation": "The array represents the integer 123. Incrementing by one gives 123 + 1 = 124."
+          },
+          {
+            "input": "digits = [4,3,2,1]",
+            "output": "[4,3,2,2]"
+          },
+          {
+            "input": "digits = [9]",
+            "output": "[1,0]"
+          }
+        ],
+        "constraints": [
+          "1 <= digits.length <= 100",
+          "0 <= digits[i] <= 9",
+          "digits does not contain any leading 0's."
+        ]
       },
       {
         "id": 8,
@@ -178,7 +250,27 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/single-number1014/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given a non-empty array of integers nums, every element appears twice except for one. Find that single one.\n\nYou must implement a solution with a linear runtime complexity and use only constant extra space.",
+        "examples": [
+          {
+            "input": "nums = [2,2,1]",
+            "output": "1"
+          },
+          {
+            "input": "nums = [4,1,2,1,2]",
+            "output": "4"
+          },
+          {
+            "input": "nums = [1]",
+            "output": "1"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 3 * 104",
+          "-3 * 104 <= nums[i] <= 3 * 104",
+          "Each element in the array appears twice except for one element which appears only once."
+        ]
       },
       {
         "id": 9,
@@ -195,7 +287,23 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/intersection-of-two-arrays2404/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given two integer arrays nums1 and nums2, return an array of their intersection. Each element in the result must be unique and you may return the result in any order.",
+        "examples": [
+          {
+            "input": "nums1 = [1,2,2,1], nums2 = [2,2]",
+            "output": "[2]"
+          },
+          {
+            "input": "nums1 = [4,9,5], nums2 = [9,4,9,8,4]",
+            "output": "[9,4]",
+            "explanation": "[4,9] is also accepted."
+          }
+        ],
+        "constraints": [
+          "1 <= nums1.length, nums2.length <= 1000",
+          "0 <= nums1[i], nums2[i] <= 1000"
+        ]
       },
       {
         "id": 10,
@@ -212,7 +320,22 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/common-elements1132/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given two integer arrays nums1 and nums2, return an array of their intersection. Each element in the result must appear as many times as it shows in both arrays and you may return the result in any order.",
+        "examples": [
+          {
+            "input": "nums1 = [1,2,2,1], nums2 = [2,2]",
+            "output": "[2,2]"
+          },
+          {
+            "input": "nums1 = [4,9,5], nums2 = [9,4,9,8,4]",
+            "output": "[4,9]"
+          }
+        ],
+        "constraints": [
+          "1 <= nums1.length, nums2.length <= 1000",
+          "0 <= nums1[i], nums2[i] <= 1000"
+        ]
       },
       {
         "id": 11,
@@ -229,7 +352,24 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/remove-duplicate-elements-from-sorted-array/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer array nums sorted in non-decreasing order, remove the duplicates in-place such that each unique element appears only once. The relative order of the elements should be kept the same.\n\nReturn k after placing the final result in the first k slots of nums.",
+        "examples": [
+          {
+            "input": "nums = [1,1,2]",
+            "output": "2, nums = [1,2,_]",
+            "explanation": "Your function should return k = 2, with the first two elements of nums being 1 and 2 respectively."
+          },
+          {
+            "input": "nums = [0,0,1,1,1,2,2,3,3,4]",
+            "output": "5, nums = [0,1,2,3,4,_,_,_,_,_]"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 3 * 104",
+          "-100 <= nums[i] <= 100",
+          "nums is sorted in non-decreasing order."
+        ]
       },
       {
         "id": 12,
@@ -245,7 +385,29 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/missing-number-in-array1416/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an array nums containing n distinct numbers in the range [0, n], return the only number in the range that is missing from the array.",
+        "examples": [
+          {
+            "input": "nums = [3,0,1]",
+            "output": "2",
+            "explanation": "n = 3 since there are 3 numbers, so all numbers are in the range [0,3]. 2 is the missing number in the range."
+          },
+          {
+            "input": "nums = [0,1]",
+            "output": "2"
+          },
+          {
+            "input": "nums = [9,6,4,2,3,5,7,0,1]",
+            "output": "8"
+          }
+        ],
+        "constraints": [
+          "n == nums.length",
+          "1 <= n <= 104",
+          "0 <= nums[i] <= n",
+          "All the numbers of nums are unique."
+        ]
       },
       {
         "id": 13,
@@ -262,7 +424,23 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/k-th-missing-element3635/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an array nums of n integers where nums[i] is in the range [1, n], return an array of all the integers in the range [1, n] that do not appear in nums.",
+        "examples": [
+          {
+            "input": "nums = [4,3,2,7,8,2,3,1]",
+            "output": "[5,6]"
+          },
+          {
+            "input": "nums = [1,1]",
+            "output": "[2]"
+          }
+        ],
+        "constraints": [
+          "n == nums.length",
+          "1 <= n <= 105",
+          "1 <= nums[i] <= n"
+        ]
       },
       {
         "id": 14,
@@ -278,7 +456,28 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/third-largest-element/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer array nums, return the third distinct maximum number in this array. If the third maximum does not exist, return the maximum number.",
+        "examples": [
+          {
+            "input": "nums = [3,2,1]",
+            "output": "1",
+            "explanation": "The first distinct maximum is 3. The second distinct maximum is 2. The third distinct maximum is 1."
+          },
+          {
+            "input": "nums = [1,2]",
+            "output": "2",
+            "explanation": "The first distinct maximum is 2. The second distinct maximum is 1. The third distinct maximum does not exist, so the maximum (2) is returned."
+          },
+          {
+            "input": "nums = [2,2,3,1]",
+            "output": "1"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 104",
+          "-231 <= nums[i] <= 231 - 1"
+        ]
       },
       {
         "id": 15,
@@ -295,7 +494,23 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/majority-element-1587115620/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an array nums of size n, return the majority element.\n\nThe majority element is the element that appears more than ⌊n / 2⌋ times. You may assume that the majority element always exists in the array.",
+        "examples": [
+          {
+            "input": "nums = [3,2,3]",
+            "output": "3"
+          },
+          {
+            "input": "nums = [2,2,1,1,1,2,2]",
+            "output": "2"
+          }
+        ],
+        "constraints": [
+          "n == nums.length",
+          "1 <= n <= 5 * 104",
+          "-109 <= nums[i] <= 109"
+        ]
       },
       {
         "id": 16,
@@ -312,7 +527,25 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/merge-two-sorted-arrays5135/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "You are given two integer arrays nums1 and nums2, sorted in non-decreasing order, and two integers m and n, representing the number of elements in nums1 and nums2 respectively.\n\nMerge nums1 and nums2 into a single array sorted in non-decreasing order.",
+        "examples": [
+          {
+            "input": "nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3",
+            "output": "[1,2,2,3,5,6]",
+            "explanation": "The arrays we are merging are [1,2,3] and [2,5,6]. The result of the merge is [1,2,2,3,5,6] with the underlined elements coming from nums1."
+          },
+          {
+            "input": "nums1 = [1], m = 1, nums2 = [], n = 0",
+            "output": "[1]"
+          }
+        ],
+        "constraints": [
+          "nums1.length == m + n",
+          "nums2.length == n",
+          "0 <= m, n <= 200",
+          "1 <= m + n <= 200"
+        ]
       },
       {
         "id": 17,
@@ -329,7 +562,24 @@ const domains = {
         "gfg": "",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer array nums and an integer val, remove all occurrences of val in nums in-place. The relative order of the elements may be changed.\n\nReturn k after placing the final result in the first k slots of nums.",
+        "examples": [
+          {
+            "input": "nums = [3,2,2,3], val = 3",
+            "output": "2, nums = [2,2,_,_]",
+            "explanation": "Your function should return k = 2, with the first two elements of nums being 2."
+          },
+          {
+            "input": "nums = [0,1,2,2,3,0,4,2], val = 2",
+            "output": "5, nums = [0,1,4,0,3,_,_,_]"
+          }
+        ],
+        "constraints": [
+          "0 <= nums.length <= 100",
+          "0 <= nums[i] <= 50",
+          "0 <= val <= 100"
+        ]
       },
       {
         "id": 18,
@@ -346,7 +596,28 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/search-insert-position-of-k-in-a-sorted-array/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.\n\nYou must write an algorithm with O(log n) runtime complexity.",
+        "examples": [
+          {
+            "input": "nums = [1,3,5,6], target = 5",
+            "output": "2"
+          },
+          {
+            "input": "nums = [1,3,5,6], target = 2",
+            "output": "1"
+          },
+          {
+            "input": "nums = [1,3,5,6], target = 7",
+            "output": "4"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 104",
+          "-104 <= nums[i] <= 104",
+          "nums contains distinct values sorted in ascending order.",
+          "-104 <= target <= 104"
+        ]
       },
       {
         "id": 19,
@@ -363,7 +634,21 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/pascal-triangle0652/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer numRows, return the first numRows of Pascal's triangle.\n\nIn Pascal's triangle, each number is the sum of the two numbers directly above it.",
+        "examples": [
+          {
+            "input": "numRows = 5",
+            "output": "[[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]"
+          },
+          {
+            "input": "numRows = 1",
+            "output": "[[1]]"
+          }
+        ],
+        "constraints": [
+          "1 <= numRows <= 30"
+        ]
       },
       {
         "id": 20,
@@ -380,7 +665,25 @@ const domains = {
         "gfg": "",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer rowIndex, return the rowIndex-th (0-indexed) row of the Pascal's triangle.",
+        "examples": [
+          {
+            "input": "rowIndex = 3",
+            "output": "[1,3,3,1]"
+          },
+          {
+            "input": "rowIndex = 0",
+            "output": "[1]"
+          },
+          {
+            "input": "rowIndex = 1",
+            "output": "[1,1]"
+          }
+        ],
+        "constraints": [
+          "0 <= rowIndex <= 33"
+        ]
       },
       {
         "id": 21,
@@ -396,7 +699,23 @@ const domains = {
         "gfg": "",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an array nums. We define a running sum of an array as runningSum[i] = sum(nums[0]…nums[i]).\n\nReturn the running sum of nums.",
+        "examples": [
+          {
+            "input": "nums = [1,2,3,4]",
+            "output": "[1,3,6,10]",
+            "explanation": "Running sum is obtained as follows: [1, 1+2, 1+2+3, 1+2+3+4]."
+          },
+          {
+            "input": "nums = [1,1,1,1,1]",
+            "output": "[1,2,3,4,5]"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 1000",
+          "-10^6 <= nums[i] <= 10^6"
+        ]
       },
       {
         "id": 22,
@@ -413,7 +732,24 @@ const domains = {
         "gfg": "https://practice.geeksforgeeks.org/problems/equilibrium-point-1587115620/1",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an array of integers nums, calculate the pivot index of this array.\n\nThe pivot index is the index where the sum of all the numbers strictly to the left of the index is equal to the sum of all the numbers strictly to the index's right.\n\nIf the index is on the left edge of the array, then the left sum is 0 because there are no elements to the left. This also applies to the right edge of the array.\n\nReturn the leftmost pivot index. If no such index exists, return -1.",
+        "examples": [
+          {
+            "input": "nums = [1,7,3,6,5,6]",
+            "output": "3",
+            "explanation": "The pivot index is 3. Left sum = nums[0] + nums[1] + nums[2] = 1 + 7 + 3 = 11. Right sum = nums[4] + nums[5] = 5 + 6 = 11."
+          },
+          {
+            "input": "nums = [1,2,3]",
+            "output": "-1",
+            "explanation": "There is no index that satisfies the conditions."
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 104",
+          "-1000 <= nums[i] <= 1000"
+        ]
       },
       {
         "id": 23,
@@ -429,7 +765,31 @@ const domains = {
         "gfg": "",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer array nums, handle multiple queries of the following type:\n\nCalculate the sum of the elements of nums between indices left and right inclusive where left <= right.",
+        "examples": [
+          {
+            "input": "nums = [-2, 0, 3, -5, 2, -1], sumRange(0, 2)",
+            "output": "1",
+            "explanation": "((-2) + 0 + 3) = 1"
+          },
+          {
+            "input": "sumRange(2, 5)",
+            "output": "-1",
+            "explanation": "(3 + (-5) + 2 + (-1)) = -1"
+          },
+          {
+            "input": "sumRange(0, 5)",
+            "output": "-3",
+            "explanation": "((-2) + 0 + 3 + (-5) + 2 + (-1)) = -3"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 104",
+          "-105 <= nums[i] <= 105",
+          "0 <= left <= right < nums.length",
+          "At most 104 calls will be made to sumRange."
+        ]
       },
       {
         "id": 24,
@@ -445,7 +805,24 @@ const domains = {
         "gfg": "",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given the array nums consisting of 2n elements in the form [x1,x2,...,xn,y1,y2,...,yn].\n\nReturn the array in the form [x1,y1,x2,y2,...,xn,yn].",
+        "examples": [
+          {
+            "input": "nums = [2,5,1,3,4,7], n = 3",
+            "output": "[2,3,5,4,1,7]",
+            "explanation": "Since x1=2, x2=5, x3=1, y1=3, y2=4, y3=7 then the answer is [2,3,5,4,1,7]."
+          },
+          {
+            "input": "nums = [1,2,3,4,4,3,2,1], n = 4",
+            "output": "[1,4,2,3,3,2,4,1]"
+          }
+        ],
+        "constraints": [
+          "1 <= n <= 500",
+          "nums.length == 2n",
+          "1 <= nums[i] <= 10^3"
+        ]
       },
       {
         "id": 25,
@@ -462,7 +839,25 @@ const domains = {
         "gfg": "",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "You are given an m x n integer grid accounts where accounts[i][j] is the amount of money the i​​​​​​​​​​th​​​​ customer has in the j​​​​​​​​​​th​​​​ bank. Return the wealth that the richest customer has.\n\nA customer's wealth is the amount of money they have in all their bank accounts. The richest customer is the customer that has the maximum wealth.",
+        "examples": [
+          {
+            "input": "accounts = [[1,2,3],[3,2,1]]",
+            "output": "6",
+            "explanation": "1st customer has wealth = 1 + 2 + 3 = 6. 2nd customer has wealth = 3 + 2 + 1 = 6."
+          },
+          {
+            "input": "accounts = [[1,5],[7,3],[3,5]]",
+            "output": "10"
+          }
+        ],
+        "constraints": [
+          "m == accounts.length",
+          "n == accounts[i].length",
+          "1 <= m, n <= 50",
+          "1 <= accounts[i][j] <= 100"
+        ]
       },
       {
         "id": 26,
@@ -479,7 +874,25 @@ const domains = {
         "gfg": "",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "There are n kids with candies. You are given an integer array candies, where each candies[i] represents the number of candies the ith kid has, and an integer extraCandies, denoting the number of extra candies that you have.\n\nReturn a boolean array result of length n, where result[i] is true if, after giving the ith kid all the extraCandies, they will have the greatest number of candies among all the kids, or false otherwise.",
+        "examples": [
+          {
+            "input": "candies = [2,3,5,1,3], extraCandies = 3",
+            "output": "[true,true,true,false,true]",
+            "explanation": "Kid 1 has 2 candies + 3 = 5 (greatest). Kid 2 has 3+3=6 (greatest). Kid 3 has 5+3=8 (greatest). Kid 4 has 1+3=4 (not greatest). Kid 5 has 3+3=6 (greatest)."
+          },
+          {
+            "input": "candies = [4,2,1,1,2], extraCandies = 1",
+            "output": "[true,false,false,false,false]"
+          }
+        ],
+        "constraints": [
+          "n == candies.length",
+          "2 <= n <= 100",
+          "1 <= candies[i] <= 100",
+          "1 <= extraCandies <= 50"
+        ]
       },
       {
         "id": 27,
@@ -496,7 +909,23 @@ const domains = {
         "gfg": "",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given the array nums, for each nums[i] find out how many numbers in the array are smaller than it. That is, for each nums[i] you have to count the number of valid j's such that j != i and nums[j] < nums[i].\n\nReturn the answer in an array.",
+        "examples": [
+          {
+            "input": "nums = [8,1,2,2,3]",
+            "output": "[4,0,1,1,3]",
+            "explanation": "For nums[0]=8 there are four smaller numbers than it (1, 2, 2 and 3). For nums[1]=1 does not exist any smaller number than it. For nums[2]=2 there is one smaller number than it (1). For nums[3]=2 there is one smaller number than it (1). For nums[4]=3 there are three smaller numbers than it (1, 2 and 2)."
+          },
+          {
+            "input": "nums = [6,5,4,8]",
+            "output": "[2,1,0,3]"
+          }
+        ],
+        "constraints": [
+          "2 <= nums.length <= 500",
+          "0 <= nums[i] <= 100"
+        ]
       },
       {
         "id": 28,
@@ -513,7 +942,27 @@ const domains = {
         "gfg": "",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer array nums, return an integer array counts where counts[i] is the number of smaller elements to the right of nums[i].",
+        "examples": [
+          {
+            "input": "nums = [5,2,6,1]",
+            "output": "[2,1,1,0]",
+            "explanation": "To the right of 5 there are 2 smaller elements (2 and 1). To the right of 2 there is only 1 smaller element (1). To the right of 6 there is 1 smaller element (1). To the right of 1 there is 0 smaller element."
+          },
+          {
+            "input": "nums = [-1]",
+            "output": "[0]"
+          },
+          {
+            "input": "nums = [-1,-1]",
+            "output": "[0,0]"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 105",
+          "-104 <= nums[i] <= 104"
+        ]
       },
       {
         "id": 29,
@@ -530,7 +979,23 @@ const domains = {
         "gfg": "",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer array nums, move all the even integers at the beginning of the array followed by all the odd integers.\n\nReturn any array that satisfies this condition.",
+        "examples": [
+          {
+            "input": "nums = [3,1,2,4]",
+            "output": "[2,4,3,1]",
+            "explanation": "The outputs [4,2,3,1], [2,4,1,3], and [4,2,1,3] would also be accepted."
+          },
+          {
+            "input": "nums = [0]",
+            "output": "[0]"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 5000",
+          "0 <= nums[i] <= 5000"
+        ]
       },
       {
         "id": 30,
@@ -547,7 +1012,24 @@ const domains = {
         "gfg": "",
         "completed": false,
         "starred": false,
-        "inTodo": false
+        "inTodo": false,
+        "description": "Given an integer array nums sorted in non-decreasing order, return an array of the squares of each number sorted in non-decreasing order.",
+        "examples": [
+          {
+            "input": "nums = [-4,-1,0,3,10]",
+            "output": "[0,1,9,16,100]",
+            "explanation": "After squaring, the array becomes [16,1,0,9,100]. After sorting, it becomes [0,1,9,16,100]."
+          },
+          {
+            "input": "nums = [-7,-3,2,3,11]",
+            "output": "[4,9,9,49,121]"
+          }
+        ],
+        "constraints": [
+          "1 <= nums.length <= 104",
+          "-104 <= nums[i] <= 104",
+          "nums is sorted in non-decreasing order."
+        ]
       },
       {
         "id": 31,
